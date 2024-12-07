@@ -25,4 +25,4 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run the script
-      run: python <nom_de_votre_script>.py
+      run: python Ia.py
