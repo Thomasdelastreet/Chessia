@@ -1,17 +1,28 @@
-name: Run Python Script
+name: Run Chessia Script
+
 on:
-  schedule:
-    - cron: '0 * * * *'  # Exécution chaque heure
+  push:
+    branches:
+      - main
+  pull_request:
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: pip install -r Chessia/requirements.txt
-      - name: Run script
-        run: python main.py
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run the script
+      run: python <nom_de_votre_script>.py
