@@ -1,8 +1,8 @@
 import chess
-import chess.engine
 import torch
 import torch.nn as nn
 import os
+import time
 
 # --- Définir le modèle IA ---
 class ChessAI(nn.Module):
@@ -19,34 +19,35 @@ class ChessAI(nn.Module):
     def forward(self, x):
         return self.fc(x)
 
-# --- Entraînement ---
-def train_ai(model, optimizer, epochs=10):
+# --- Fonction d'entraînement ---
+def train_ai(model, optimizer, save_interval=100, save_path="chess_ai.pth"):
     criterion = nn.MSELoss()
-    for epoch in range(epochs):
-        # Exemple de données factices pour l'entraînement (à adapter)
+    iteration = 0
+
+    while True:  # Boucle infinie
         board = chess.Board()
-        inputs = torch.rand(1, 773)  # Représentation simplifiée
+        inputs = torch.rand(1, 773)  # Exemple de représentation simplifiée
         labels = torch.tensor([[0.5]])  # Évaluation factice
-        
+
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
 
-    print("Entraînement terminé")
-    return model
+        iteration += 1
 
-# Charger ou créer un modèle
+        if iteration % save_interval == 0:
+            torch.save(model.state_dict(), save_path)
+            print(f"[{time.ctime()}] Modèle sauvegardé après {iteration} itérations. Perte : {loss.item():.4f}")
+
+# --- Initialiser ou charger un modèle ---
 model_path = "chess_ai.pth"
 model = ChessAI()
 if os.path.exists(model_path):
     model.load_state_dict(torch.load(model_path))
 
-# Optimisation et entraînement
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-model = train_ai(model, optimizer)
 
-# Sauvegarder le modèle
-torch.save(model.state_dict(), model_path)
-print(f"Modèle sauvegardé dans {model_path}")
+# Lancer l'entraînement en boucle infinie
+train_ai(model, optimizer)
