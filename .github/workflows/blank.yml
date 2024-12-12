@@ -2,7 +2,7 @@ name: Train Chess AI
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Exécuter toutes les 15 minutes
+    - cron: '*/1 * * * *'  # Exécuter toutes les 15 minutes
 
 jobs:
   train-chess-ai:
