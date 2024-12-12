@@ -1,0 +1,8 @@
+{
+  "name": "chess-ai",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "train_ai.py"
+  },
+  "dependencies": {}
+}
