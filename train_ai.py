@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import os
 import time
+import subprocess
 
 # --- Définir le modèle IA ---
 class ChessAI(nn.Module):
@@ -48,13 +49,34 @@ def train_ai(model, optimizer, duration=600, save_interval=300, save_path="chess
         if int(time.time() - start_time) % save_interval == 0:
             torch.save(model.state_dict(), save_path)
             print(f"[{time.ctime()}] Modèle sauvegardé après {iteration} itérations. Perte : {loss.item():.4f}")
+            push_to_github(save_path)  # Pousser le fichier sur GitHub
 
     # Sauvegarde finale avant arrêt
     torch.save(model.state_dict(), save_path)
     print(f"Entraînement terminé après {iteration} itérations. Modèle sauvegardé dans '{save_path}'.")
+    push_to_github(save_path)
+
+# --- Fonction pour pousser le fichier sur GitHub ---
+def push_to_github(file_path):
+    """
+    Commit et push le fichier spécifié sur GitHub.
+    """
+    try:
+        # Ajouter le fichier à Git
+        subprocess.run(["git", "add", file_path], check=True)
+        # Committer les changements
+        subprocess.run(
+            ["git", "commit", "-m", f"Update {file_path} with new training data"],
+            check=True,
+        )
+        # Pousser les changements
+        subprocess.run(["git", "push"], check=True)
+        print(f"Fichier '{file_path}' poussé sur GitHub avec succès.")
+    except subprocess.CalledProcessError as e:
+        print(f"Erreur lors du commit/push sur GitHub : {e}")
 
 # --- Initialiser ou charger un modèle ---
-model_path = ".github/workflows"
+model_path = "chess_ai.pth"
 model = ChessAI()
 if os.path.exists(model_path):
     model.load_state_dict(torch.load(model_path))
