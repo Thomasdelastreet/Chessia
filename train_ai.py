@@ -54,7 +54,7 @@ def train_ai(model, optimizer, duration=600, save_interval=300, save_path="chess
     print(f"Entraînement terminé après {iteration} itérations. Modèle sauvegardé dans '{save_path}'.")
 
 # --- Initialiser ou charger un modèle ---
-model_path = "Chessia/chess_ai.pth"
+model_path = ".github/workflows"
 model = ChessAI()
 if os.path.exists(model_path):
     model.load_state_dict(torch.load(model_path))
