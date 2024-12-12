@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 import os
 import time
-import subprocess
 
 # --- Définir le modèle IA ---
 class ChessAI(nn.Module):
@@ -21,11 +20,18 @@ class ChessAI(nn.Module):
         return self.fc(x)
 
 # --- Fonction d'entraînement ---
-def train_ai(model, optimizer, save_interval=100, save_path="chess_ai.pth"):
+def train_ai(model, optimizer, duration=600, save_interval=300, save_path="chess_ai.pth"):
+    """
+    Entraîne le modèle avec une durée limite. Sauvegarde régulièrement l'état du modèle.
+    - `duration` : Durée totale de l'entraînement en secondes.
+    - `save_interval` : Intervalle entre deux sauvegardes en secondes.
+    - `save_path` : Chemin du fichier pour sauvegarder le modèle.
+    """
     criterion = nn.MSELoss()
+    start_time = time.time()
     iteration = 0
 
-    while True:  # Boucle infinie
+    while time.time() - start_time < duration:  # Boucle jusqu'à atteindre la durée limite
         board = chess.Board()
         inputs = torch.rand(1, 773)  # Exemple de représentation simplifiée
         labels = torch.tensor([[0.5]])  # Évaluation factice
@@ -38,29 +44,23 @@ def train_ai(model, optimizer, save_interval=100, save_path="chess_ai.pth"):
 
         iteration += 1
 
-        if iteration % save_interval == 0:
+        # Sauvegarde périodique
+        if int(time.time() - start_time) % save_interval == 0:
             torch.save(model.state_dict(), save_path)
             print(f"[{time.ctime()}] Modèle sauvegardé après {iteration} itérations. Perte : {loss.item():.4f}")
-            push_to_github()
 
-# --- Fonction pour pousser le modèle sur GitHub ---
-def push_to_github():
-    try:
-        subprocess.run(["git", "add", "chess_ai.pth"], check=True)
-        subprocess.run(["git", "commit", "-m", "Mise à jour du modèle d'IA"], check=True)
-        subprocess.run(["git", "push"], check=True)
-        print("[INFO] Modèle poussé sur GitHub.")
-    except subprocess.CalledProcessError as e:
-        print(f"[ERREUR] Impossible de pousser sur GitHub : {e}")
+    # Sauvegarde finale avant arrêt
+    torch.save(model.state_dict(), save_path)
+    print(f"Entraînement terminé après {iteration} itérations. Modèle sauvegardé dans '{save_path}'.")
 
 # --- Initialiser ou charger un modèle ---
 model_path = "chess_ai.pth"
 model = ChessAI()
 if os.path.exists(model_path):
     model.load_state_dict(torch.load(model_path))
+    print("Modèle chargé depuis", model_path)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-# Lancer l'entraînement en boucle infinie
-train_ai(model, optimizer)
-
+# Lancer l'entraînement avec limite de durée
+train_ai(model, optimizer, duration=600, save_interval=300, save_path=model_path)
