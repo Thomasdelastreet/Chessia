@@ -32,6 +32,7 @@ jobs:
 
       - name: Push updated model to repository
         run: |
-          git add chess_ai.pth
-          git commit -m "Update model file after training"
+          git add chess_ai.pth --force
+          git commit -m "Update model file after training" || echo "Nothing to commit"
           git push
+
