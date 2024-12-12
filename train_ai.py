@@ -86,3 +86,4 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # Lancer l'entraînement avec limite de durée
 train_ai(model, optimizer, duration=600, save_interval=300, save_path=model_path)
+
