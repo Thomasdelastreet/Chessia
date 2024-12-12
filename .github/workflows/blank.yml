@@ -2,37 +2,37 @@ name: Train Chess AI
 
 on:
   schedule:
-    - cron: '*/1 * * * *'  # Exécuter toutes les 15 minutes
+    - cron: "*/5 * * * *" # Toutes les 5 minutes
 
 jobs:
-  train-chess-ai:
+  train_ai:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set Git user
-        run: |
-          git config --global user.email "bernard.thomas2011@gmail.com"
-          git config --global user.name "Thomasdelastreet"
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install torch==2.0.1 chess
+    - name: Run Training Script
+      run: python train_ai.py
 
-      - name: Run training script
-        run: python train_ai.py
+    - name: Commit and Push Model
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "GitHub Actions Bot"
+        git add chess_ai.pth
+        git commit -m "Update chess_ai.pth with new training data" || echo "No changes to commit"
+        git push https://github-actions:${{ secrets.GH_PAT }}@github.com/Thomasdelastreet/Chessia.git main || echo "Push failed"
 
-      - name: Push updated model to repository
-        run: |
-          git add chess_ai.pth --force
-          git commit -m "Update model file after training" || echo "Nothing to commit"
-          git push
 
