@@ -20,7 +20,7 @@ class ChessAI(nn.Module):
     def forward(self, x):
         return self.fc(x)
 
-# --- Fonction d'entraînement ---
+
 def train_ai(model, optimizer, duration=600, save_interval=300, save_path="chess_ai.pth"):
     """
     Entraîne le modèle avec une durée limite. Sauvegarde régulièrement l'état du modèle.
