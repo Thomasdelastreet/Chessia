@@ -1,29 +1,48 @@
-name: Train AI
+name: Train AI and Save to Google Drive
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # Runs every 5 minutes
+    - cron: "*/5 * * * *" # Exécution toutes les 5 minutes
 
 jobs:
   train:
     runs-on: ubuntu-latest
+
     steps:
+      # Étape 1 : Cloner le dépôt
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Étape 2 : Configurer Git pour éviter les erreurs
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      # Étape 3 : Installer Python et gérer le cache des dépendances
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: 3.9
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Étape 4 : Entraîner l'IA
       - name: Train AI
         run: python train_ai.py
 
+      # Étape 5 : Uploader sur Google Drive
       - name: Upload model to Google Drive
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
