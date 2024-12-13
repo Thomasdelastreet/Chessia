@@ -35,4 +35,11 @@ jobs:
         git commit -m "Update chess_ai.pth with new training data" || echo "No changes to commit"
         git push https://github-actions:${{ secrets.GH_PAT }}@github.com/Thomasdelastreet/Chessia.git main || echo "Push failed"
 
+steps:
+- name: Setup credentials for Google Drive
+  run: echo "${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}" > credentials.json
+
+- name: Run Training Script
+  run: python train_ai.py
+
 
