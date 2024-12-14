@@ -1,40 +1,39 @@
-name: Train and Upload AI
+name: Train and Upload Chess AI
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # Exécute toutes les 5 minutes
-  workflow_dispatch: # Permet d'exécuter manuellement
+    - cron: '*/5 * * * *'  # Exécute toutes les 5 minutes
+  workflow_dispatch:  # Permet de déclencher manuellement le workflow
 
 jobs:
-  train_and_upload:
+  train-and-upload:
     runs-on: ubuntu-latest
 
     steps:
-    # Étape 1 : Vérifier le dépôt
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # Étape 1 : Vérifier le code source
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    # Étape 2 : Configurer Python
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
+      # Étape 2 : Configurer Python et installer les dépendances
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
 
-    # Étape 3 : Installer les dépendances
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    # Étape 4 : Exécuter le script d'entraînement
-    - name: Train AI
-      run: python train_ai.py
+      # Étape 3 : Entraîner l'IA
+      - name: Train Chess AI
+        run: python train_ai.py
 
-    # Étape 5 : Upload vers Google Drive
-    - name: Upload to Google Drive
-      env:
-        CLIENT_SECRET_JSON: ${{ secrets.CLIENT_SECRET_JSON }}
-        REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-      run: |
-        echo "${{ secrets.CLIENT_SECRET_JSON }}" > client_secrets.json
-        python upload_to_drive.py chess_ai.pth
+      # Étape 4 : Créer le fichier client_secrets.json
+      - name: Create client_secrets.json
+        run: |
+          echo "${{ secrets.CLIENT_SECRET_JSON }}" > client_secrets.json
+
+      # Étape 5 : Télécharger le fichier entraîné sur Google Drive
+      - name: Upload model to Google Drive
+        run: python upload_to_drive.py
