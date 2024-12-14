@@ -1,9 +1,0 @@
-Flask==2.3.3
-flask-socketio==5.3.5
-python-chess==1.999
-torch==2.0.0
-eventlet==0.33.3
-numpy<2
-google-auth
-google-auth-oauthlib
-google-api-python-client
